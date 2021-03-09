@@ -4,8 +4,8 @@ import pprint
 import voluseg
 
 ### set these parameters ###
-dir_input = '/path/to/raw/data'
-dir_output = '/path/to/segmented/data'
+dir_input = '/nrs/ahrens/jing/state_modulation/MG_vs_replayGU/20201101/fish02/9dpf_HuC-GC6F_MG-vs-ReplayGU_fish02_exp02_20201101_214112/im_CM0'
+dir_output = '/nrs/ahrens/jing/state_modulation/MG_vs_replayGU/20201101/fish02/9dpf_HuC-GC6F_MG-vs-ReplayGU_fish02_exp02_20201101_214112/im_CM0-voluseg'
 channel_file = os.path.join(dir_input,'ch0.xml')
 stack_file = os.path.join(dir_input,'Stack_frequency.txt')
 ### end set these parameters ###

@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+##/groups/ahrens/home/limj2/anaconda3/envs/python37/bin/python
+##/usr/bin/env python3
+##/usr/bin/env python
 
 # set up
 import os
@@ -30,9 +33,14 @@ name_user = os.getenv('USER')
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 name_job = 'voluseg_%s_%s'%(name_user, timestamp)
 
+# get number of cores
+# ncores = os.getenv('LSB_DJOB_NUMPROC')
+# worker_mem = ncores * 14
+
 # define environment worker variables
 os.environ['SPARK_WORKER_DIR'] = '/scratch/%s/%s'%(name_user,name_job)
 os.environ['SPARK_LOCAL_DIRS'] = '/scratch/%s/%s'%(name_user,name_job)
+# os.environ['SPARK_WORKER_MEMORY'] = '%sg'%(worker_mem)
 
 name_master = 'master_%s'%(name_job)
 name_workers = 'worker_%s[1-%s]'%(name_job,n_workers)
