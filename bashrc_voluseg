@@ -1,6 +1,0 @@
-export MKL_NUM_THREADS=1
-export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
-export PATH=/groups/ahrens/home/ahrens_lab/ants/bin:$PATH
-export PATH=/groups/ahrens/home/limj2/anaconda3/envs/python37/bin:$PATH
-test -f $HOME/spark-env.sh && source $HOME/spark-env.sh
-# source /groups/ahrens/home/limj2/spark-env.sh
