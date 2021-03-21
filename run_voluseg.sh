@@ -6,4 +6,4 @@ dir_output=/nrs/ahrens/jing/state_modulation/MG_vs_replayGU/20201101/fish02/9dpf
 n_hours=24  ## default: 8
 n_tasks=2  ## default: 2
 janelia_voluseg_dir=~/janelia_voluseg/voluseg_spark_janelia
-bsub -n32 -o /nrs/ahrens/jing/bsub_logs/%J.log $PYSPARK_PYTHON $janelia_voluseg_dir $n_nodes $dir_output $n_hours $n_tasks
+bsub -n47 -o /nrs/ahrens/jing/bsub_logs/%J.log $PYSPARK_PYTHON $janelia_voluseg_dir $n_nodes $dir_output $n_hours $n_tasks

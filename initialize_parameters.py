@@ -4,8 +4,8 @@ import pprint
 import voluseg
 
 ### set these parameters ###
-dir_input = '/nrs/ahrens/jing/state_modulation/MG_vs_replayGU/20201101/fish02/9dpf_HuC-GC6F_MG-vs-ReplayGU_fish02_exp02_20201101_214112/im_CM0'
-dir_output = '/nrs/ahrens/jing/state_modulation/MG_vs_replayGU/20201101/fish02/9dpf_HuC-GC6F_MG-vs-ReplayGU_fish02_exp02_20201101_214112/im_CM0-voluseg'
+dir_input = '/scratch/limj2/state_modulation/GRAB_NE/20210304/fish03/6dpf_GRABNE_MG-vs-LGGU-fmg_fish03_exp02_20210304_220752/im_CM0'
+dir_output = '/scratch/limj2/state_modulation/GRAB_NE/20210304/fish03/6dpf_GRABNE_MG-vs-LGGU-fmg_fish03_exp02_20210304_220752/im_CM0_voluseg'
 channel_file = os.path.join(dir_input,'ch0.xml')
 stack_file = os.path.join(dir_input,'Stack_frequency.txt')
 ### end set these parameters ###
@@ -19,7 +19,7 @@ parameters0['dir_output'] = dir_output
 parameters0 = voluseg.load_metadata(parameters0, channel_file, stack_file)
 
 # set other parameters as necessary
-parameters0['diam_cell'] = 5.0
+parameters0['diam_cell'] = 6.0
 
 # create parameter file with metadata
 voluseg.step0_process_parameters(parameters0)
