@@ -1,0 +1,166 @@
+#+STARTUP: entitiespretty
+
+* How to install ~voluseg~?
+1.	Install the pipeline (pip install git+https://github.com/mikarubi/voluseg.git), and its dependencies.
+2.	Clone janelia_voluseg e.g. to your home directory: git clone https://github.com/mikarubi/janelia_voluseg
+3.	Add the following to your .bashrc:
+   #+begin_src
+   ## add to .bashrc
+   export MKL_NUM_THREADS=1
+   export ITK_GLOBAL_DEFAULT_NUMBER_OF_THREADS=1
+   export PATH=/groups/ahrens/home/ahrens_lab/ants/bin:$PATH
+   export SPARK_HOME=/misc/local/spark-versions/spark-3.0.1
+   export PATH=/path/to/your/python:$PATH
+   export PYSPARK_PYTHON=/path/to/your/python
+   ## end add to .bashrc
+   #+end_src
+
+* How to update ~voluseg~?
+
+#+begin_src bash
+python37pip install --upgrade --force-reinstall git+https://github.com/mikarubi/voluseg.git
+#+end_src
+
+Or run ~update_voluseg.sh~ which has more, but untested features
+
+* General instructions to run the pipeline
+1.	Use initialize_parameters.py in janelia_voluseg to set and save the parameters. This script tries to automatically pull some parameters from ch0.xml and Stack frequency.txt. Save parameters in your output directory.
+2.	Run pipeline as follows: bsub -n32 path/to/janelia_voluseg/voluseg_spark_janelia [number_of_nodes] /path/to/your/output/directory
+This command will start spark, run the pipeline, and shut down spark.
+NB: you could probably get away with bsub -n8 ... in most cases.
+
+* Pipelines and instructions to run them
+** 1) Update ~initialize_parameters.py~ with data directories
+** 2a) Full Mika's pipeline
+*** 1) Enable registration by commenting out the following lines in ~initialize_parameters.py~
+#+begin_src python
+# parameters0['registration'] = 'none'
+#+end_src
+*** 2) Ensure that all steps are enabled (i.e. not commented out)
+The steps are
+#+begin_src python
+
+# load parameters
+parameters = voluseg.load_parameters(os.path.join(dir_output, 'parameters.pickle'))
+with open(file_output, 'a') as fh:
+    pprint.pprint(parameters, fh)
+
+tic = time.time()
+voluseg.step1_process_volumes(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step1_process_volumes: %.1f seconds\n'%(time.time() - tic))
+
+tic = time.time()
+voluseg.step2_align_volumes(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step2_align_volumes: %.1f seconds\n'%(time.time() - tic))
+
+tic = time.time()
+voluseg.step3_mask_volumes(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step3_mask_volumes: %.1f seconds\n'%(time.time() - tic))
+
+tic = time.time()
+voluseg.step4_detect_cells(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step4_detect_cells: %.1f seconds\n'%(time.time() - tic))
+
+# shut down spark if not parallel clean
+if not parameters['parallel_clean']:
+    from subprocess import run
+    name_workers = sys.argv[2]
+    run(['bkill','-J',name_workers])
+
+tic = time.time()
+voluseg.step5_clean_cells(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step5_clean_cells: %.1f seconds\n'%(time.time() - tic))
+
+#+end_src
+
+** 2b) Greg's registration, Mika's segmentation
+*** 1) Disable registration by adding the following lines in ~initialize_parameters.py~
+#+begin_src python
+parameters0['registration'] = 'none'
+#+end_src
+
+*** 2) Ensure that steps 1 and 2 are disabled
+The steps are
+#+begin_src python
+
+# load parameters
+parameters = voluseg.load_parameters(os.path.join(dir_output, 'parameters.pickle'))
+with open(file_output, 'a') as fh:
+    pprint.pprint(parameters, fh)
+
+# tic = time.time()
+# voluseg.step1_process_volumes(parameters)
+# with open(file_output, 'a') as fh:
+#     fh.write('step1_process_volumes: %.1f seconds\n'%(time.time() - tic))
+
+# tic = time.time()
+# voluseg.step2_align_volumes(parameters)
+# with open(file_output, 'a') as fh:
+#     fh.write('step2_align_volumes: %.1f seconds\n'%(time.time() - tic))
+
+tic = time.time()
+voluseg.step3_mask_volumes(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step3_mask_volumes: %.1f seconds\n'%(time.time() - tic))
+
+tic = time.time()
+voluseg.step4_detect_cells(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step4_detect_cells: %.1f seconds\n'%(time.time() - tic))
+
+# shut down spark if not parallel clean
+if not parameters['parallel_clean']:
+    from subprocess import run
+    name_workers = sys.argv[2]
+    run(['bkill','-J',name_workers])
+
+tic = time.time()
+voluseg.step5_clean_cells(parameters)
+with open(file_output, 'a') as fh:
+    fh.write('step5_clean_cells: %.1f seconds\n'%(time.time() - tic))
+
+#+end_src
+
+
+*** 3) Prepare data
+- Remove oscillation artefact (if any)
+- Downsample data by binning, replacing step 1
+- Register all frames using ~CircuitSeeker~
+- Package results of registration in preparation of step 3
+  - Step 3 expects data to be in the following directory structure: ~/dir_output/volume/0/TMxxxx.h5~
+** 3) Update ~run_voluseg.sh~ or ~run_local_voluseg.sh~
+- Update ~dir_output~
+- Check ~properties_file_path=~/janelia_voluseg/spark_properties_ws1.conf~
+** 6) Run ~initialize_parameters.py~
+#+begin_src bash
+python ~/janelia_voluseg/initialize_parameters.py
+#+end_src
+** 5) Run either ~runvoluseg~ or ~runvoluseg_local~
+#+begin_src bash
+alias runvoluseg='bash --noprofile --norc $HOME/janelia_voluseg/run_voluseg.sh'
+alias runvoluseg_local='bash --noprofile --norc $HOME/janelia_voluseg/run_local_voluseg.sh'
+#+end_src
+* Code snippets
+** Customize time points used for segmentation
+#+begin_src python
+import os
+import numpy as np
+import h5py
+timeseries_h5_path = os.path.join(parameters['dir_output'], 'mean_timeseries.hdf5')
+new_timepoints = np.arange(0, parameters['volume_names'].shape[0], 20)
+
+with h5py.File(timeseries_h5_path, 'a') as hf:
+    timepoints_dataset = hf['timepoints']
+    print(f'Old timepoints: {timepoints_dataset[:]}')
+    del hf['timepoints']
+    hf.create_dataset('timepoints', data=new_timepoints)
+
+with h5py.File(timeseries_h5_path, 'r') as hf:
+    timepoints_dataset = hf['timepoints']
+    print(f'New timepoints: {timepoints_dataset[:]}')
+#+end_src

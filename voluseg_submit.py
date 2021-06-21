@@ -45,6 +45,22 @@ voluseg.step3_mask_volumes(parameters)
 with open(file_output, 'a') as fh:
     fh.write('step3_mask_volumes: %.1f seconds\n'%(time.time() - tic))
 
+# import os
+# import numpy as np
+# import h5py
+# timeseries_h5_path = os.path.join(parameters['dir_output'], 'mean_timeseries.hdf5')
+# new_timepoints = np.arange(0, parameters['volume_names'].shape[0], 20)
+
+# with h5py.File(timeseries_h5_path, 'a') as hf:
+#     timepoints_dataset = hf['timepoints']
+#     print(f'Old timepoints: {timepoints_dataset[:]}')
+#     del hf['timepoints']
+#     hf.create_dataset('timepoints', data=new_timepoints)
+
+# with h5py.File(timeseries_h5_path, 'r') as hf:
+#     timepoints_dataset = hf['timepoints']
+#     print(f'New timepoints: {timepoints_dataset[:]}')
+
 tic = time.time()
 voluseg.step4_detect_cells(parameters)
 with open(file_output, 'a') as fh:
