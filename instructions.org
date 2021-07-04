@@ -145,6 +145,12 @@ python ~/janelia_voluseg/initialize_parameters.py
 alias runvoluseg='bash --noprofile --norc $HOME/janelia_voluseg/run_voluseg.sh'
 alias runvoluseg_local='bash --noprofile --norc $HOME/janelia_voluseg/run_local_voluseg.sh'
 #+end_src
+** 6) Check Spark job status page for progress
+spark.driver.host:4040/jobs/
+
+Find ~spark.driver.host~ in ~/output_dir/prepro.output~
+
+Example for ws3: http://e06u03.int.janelia.org:4040/jobs/
 * Code snippets
 ** Customize time points used for segmentation
 #+begin_src python
