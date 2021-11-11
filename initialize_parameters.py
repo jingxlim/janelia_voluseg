@@ -4,8 +4,8 @@ import pprint
 import voluseg
 
 ### set these parameters ###
-dir_input = '/scratch/limj2/data/20201017/fish02/8dpf_HuC-GCaMP7f-Gfap-rgeco_alldiromr_fish02_exp05_20201017_230842/im_CM1'
-dir_output = '/scratch/limj2/data/20201017/fish02/8dpf_HuC-GCaMP7f-Gfap-rgeco_alldiromr_fish02_exp05_20201017_230842/im_CM1_voluseg'
+dir_input = '/scratch/limj2/data/raw/20211008/fish01/6dpf_elavl3-gc8f-gfap-jregeco_MG-vs-NGGU-trunc35_fish01_exp03_20211009_004814/im_CM0'
+dir_output = '/scratch/im_CM0_voluseg'
 channel_file = os.path.join(dir_input,'ch0.xml')
 stack_file = os.path.join(dir_input,'Stack_frequency.txt')
 ### end set these parameters ###
@@ -19,10 +19,12 @@ parameters0['dir_output'] = dir_output
 parameters0 = voluseg.load_metadata(parameters0, channel_file, stack_file)
 
 # set other parameters as necessary
+parameters0['ds'] = 2  # default is 2 | if downsampled already, make sure this matches that
 parameters0['diam_cell'] = 6.0  #  cell_diameter = 6: 100-150k cells, cell_diameter=5: ~300-400k cells
 parameters0['n_cells_block'] = 200  # increase block size to reduce blockiness in segments
-# parameters0['registration'] = 'none'  # default: run registration
+parameters0['registration'] = 'none'  # comment or set to 'medium' to enable default (i.e. run registration)
 parameters0['parallel_volume']=False  # False if running on local workstation
+parameters0['parallel_clean']=False  # False if running on local workstation
 parameters0['timepoints_type']='periodic'
 parameters0['t_section'] = 0
 

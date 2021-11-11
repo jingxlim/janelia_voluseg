@@ -30,21 +30,22 @@ parameters = voluseg.load_parameters(os.path.join(dir_output, 'parameters.pickle
 with open(file_output, 'a') as fh:
     pprint.pprint(parameters, fh)
 
-tic = time.time()
-voluseg.step1_process_volumes(parameters)
-with open(file_output, 'a') as fh:
-    fh.write('step1_process_volumes: %.1f seconds\n'%(time.time() - tic))
+# tic = time.time()
+# voluseg.step1_process_volumes(parameters)
+# with open(file_output, 'a') as fh:
+#     fh.write('step1_process_volumes: %.1f seconds\n'%(time.time() - tic))
 
-tic = time.time()
-voluseg.step2_align_volumes(parameters)
-with open(file_output, 'a') as fh:
-    fh.write('step2_align_volumes: %.1f seconds\n'%(time.time() - tic))
+# tic = time.time()
+# voluseg.step2_align_volumes(parameters)
+# with open(file_output, 'a') as fh:
+#     fh.write('step2_align_volumes: %.1f seconds\n'%(time.time() - tic))
 
 tic = time.time()
 voluseg.step3_mask_volumes(parameters)
 with open(file_output, 'a') as fh:
     fh.write('step3_mask_volumes: %.1f seconds\n'%(time.time() - tic))
 
+## Manually define time points
 # import os
 # import numpy as np
 # import h5py
@@ -67,10 +68,11 @@ with open(file_output, 'a') as fh:
     fh.write('step4_detect_cells: %.1f seconds\n'%(time.time() - tic))
 
 # shut down spark if not parallel clean
-if not parameters['parallel_clean']:
-    from subprocess import run
-    name_workers = sys.argv[2]
-    run(['bkill','-J',name_workers])
+# only on the Janelia cluster
+# if not parameters['parallel_clean']:
+#     from subprocess import run
+#     name_workers = sys.argv[2]
+#     run(['bkill','-J',name_workers])
 
 tic = time.time()
 voluseg.step5_clean_cells(parameters)

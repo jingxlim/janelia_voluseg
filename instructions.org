@@ -23,13 +23,14 @@ python37pip install --upgrade --force-reinstall git+https://github.com/mikarubi/
 
 Or run ~update_voluseg.sh~ which has more, but untested features
 
-* General instructions to run the pipeline
+* General instructions to run the pipeline (from Mika)
+
 1.	Use initialize_parameters.py in janelia_voluseg to set and save the parameters. This script tries to automatically pull some parameters from ch0.xml and Stack frequency.txt. Save parameters in your output directory.
 2.	Run pipeline as follows: bsub -n32 path/to/janelia_voluseg/voluseg_spark_janelia [number_of_nodes] /path/to/your/output/directory
 This command will start spark, run the pipeline, and shut down spark.
 NB: you could probably get away with bsub -n8 ... in most cases.
 
-* Pipelines and instructions to run them
+* My pipelines and instructions to run them
 ** 1) Update ~initialize_parameters.py~ with data directories
 ** 2a) Full Mika's pipeline
 *** 1) Enable registration by commenting out the following lines in ~initialize_parameters.py~
@@ -128,11 +129,13 @@ with open(file_output, 'a') as fh:
 
 
 *** 3) Prepare data
-- Remove oscillation artefact (if any)
-- Downsample data by binning, replacing step 1
-- Register all frames using ~CircuitSeeker~
-- Package results of registration in preparation of step 3
-  - Step 3 expects data to be in the following directory structure: ~/dir_output/volume/0/TMxxxx.h5~
+1. Remove oscillation artefact (if any)
+2. Register all frames using ~CircuitSeeker~
+3. Downsample data by binning, replacing step 1 of Mika's pipeline
+4. Package results of registration in preparation of step 3
+   - Step 3 expects data to be in the following directory structure: ~/dir_output/volumes/0/TMxxxx.hdf5~
+   - In addition, dataset names must be volume
+
 ** 3) Update ~run_voluseg.sh~ or ~run_local_voluseg.sh~
 - Update ~dir_output~
 - Check ~properties_file_path=~/janelia_voluseg/spark_properties_ws1.conf~

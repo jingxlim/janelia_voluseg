@@ -1,0 +1,49 @@
+#+TITLE: voluseg notes
+
+* 21NOV19
+** Figuring out how blocks are defined
+#+begin_src
+rxyz = np.diag(p.affine_mat)[:3]
+
+# compute number of blocks (do only once)
+lx = 2048
+ly = 1024
+lz = 53
+rx, ry, rz = rxyz
+n_voxels_cell = np.pi * ((p.diam_cell / 2.0)**2) / (rx * ry)
+n_voxels_cell = np.round(n_voxels_cell).astype(int)
+n_cells_block = 100
+
+# get initial estimate for the number of blocks
+n_blocks = lx * ly * lz / (n_cells_block * n_voxels_cell)
+
+part_block = np.round(np.cbrt(n_blocks)).astype(int)
+
+z0_range = np.unique(np.round(np.linspace(0, lz, part_block+1)).astype(int))
+#+end_src
+** Compute ~mean_timeseries_raw~ in Step 3
+#+begin_src
+from analysis_toolbox.fileio import h5s_to_dask
+hdf5_data = h5s_to_dask(hdf5_paths, 'volume', chunks=(1, None, None, None))
+
+display(hdf5_data)
+
+t_chunks = 5000
+num_chunks = int(np.ceil(hdf5_data.shape[0] / t_chunks))
+regions = [slice(i*t_chunks,(i+1)*t_chunks, None) if i < (num_chunks-1) else slice(i*t_chunks, None, None) for i in range(num_chunks)]
+
+with start_cluster(
+    cores=8,
+    force_local=False, processes=32,
+    worker_lifetime="350s", worker_lifetime_stagger="2m",
+    death_timeout=1200, store_logs=True, spillover=True, verbose=True) as cluster, Client(cluster) as client:
+
+    display(client)
+
+    ## still losing keys but seems to have better outcomes when the job is divided
+    ## I believe the job stalled when the job wasn't divided
+    ## divided job is also more tractable because the dask dashboard is more responsive
+    ## workers die even when the job was divided, so I'm restarting the client every loop
+    for region in tqdm(regions):
+        mean_timeseries_raw[color_i, region] = da.nanmean(hdf5_data[region], axis=(1,2,3)).compute()
+#+end_src
